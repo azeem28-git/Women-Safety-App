@@ -60,18 +60,20 @@ def create_app(config_name=None):
         return render_template('errors/500.html'), 500
 
     with app.app_context():
-        db.create_all()
-        # Create default admin if not exists
-        if not Admin.query.filter_by(username='admin').first():
-            admin = Admin(
-                username='admin',
-                email='admin@womensafety.com',
-                is_super_admin=True
-            )
-            admin.set_password('Admin@123')
-            db.session.add(admin)
-            db.session.commit()
-            print("Default admin created: username=admin, password=Admin@123")
+        # Optionally skip DB creation (useful when remote DB is unreachable).
+        if os.environ.get('SKIP_DB_CREATE', '0') != '1':
+            db.create_all()
+            # Create default admin if not exists
+            if not Admin.query.filter_by(username='admin').first():
+                admin = Admin(
+                    username='admin',
+                    email='admin@womensafety.com',
+                    is_super_admin=True
+                )
+                admin.set_password('Admin@123')
+                db.session.add(admin)
+                db.session.commit()
+                print("Default admin created: username=admin, password=Admin@123")
 
     return app
 
