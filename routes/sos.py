@@ -14,9 +14,16 @@ def sos_history():
 @sos_bp.route('/sos/trigger', methods=['POST'])
 @login_required
 def trigger_sos():
-    data = request.get_json()
-    lat = data.get('latitude')
-    lng = data.get('longitude')
+    data = request.get_json(silent=True) or request.form.to_dict() or {}
+
+    def parse_float(value):
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None
+
+    lat = parse_float(data.get('latitude'))
+    lng = parse_float(data.get('longitude'))
     address = data.get('address', 'Location not available')
 
     contacts = EmergencyContact.query.filter_by(user_id=current_user.id).all()

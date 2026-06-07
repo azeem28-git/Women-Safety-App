@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from datetime import datetime
@@ -5,9 +6,15 @@ from models import db, User, EmergencyContact, SOSHistory, IncidentReport, Admin
 from config import config
 import json
 
-def create_app(config_name='default'):
-    app = Flask(__name__)
+def create_app(config_name=None):
+    if config_name is None:
+        config_name = os.environ.get('FLASK_CONFIG') or (
+            'production' if os.environ.get('FLASK_ENV') == 'production' else 'default'
+        )
+
+    app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(config[config_name])
+    os.makedirs(app.instance_path, exist_ok=True)
 
     db.init_app(app)
 
