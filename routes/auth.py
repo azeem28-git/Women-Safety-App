@@ -48,16 +48,17 @@ def register():
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('dashboard.home'))
+
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
         remember = request.form.get('remember', False)
 
         user = User.query.filter_by(email=email).first()
+
         if user and user.check_password(password) and user.is_active:
             login_user(user, remember=bool(remember))
-            user.last_login = datetime.utcnow()
-            db.session.commit()
+
             next_page = request.args.get('next')
             flash(f'Welcome back, {user.full_name}!', 'success')
             return redirect(next_page or url_for('dashboard.home'))
@@ -65,7 +66,6 @@ def login():
             flash('Invalid email or password.', 'danger')
 
     return render_template('auth/login.html')
-
 @auth_bp.route('/logout')
 @login_required
 def logout():
