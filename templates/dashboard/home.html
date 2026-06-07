@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - SafeHer{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-content">
+
+  <!-- SOS Button Hero -->
+  <div class="sos-hero-card">
+    <div class="sos-hero-content">
+      <div>
+        <h2 class="sos-hero-greeting">Hello, {{ current_user.full_name.split()[0] }} 👋</h2>
+        <p class="sos-hero-sub">You have <strong>{{ contacts|length }}</strong> emergency contact{% if contacts|length != 1 %}s{% endif %} ready.</p>
+        {% if not contacts %}
+        <a href="{{ url_for('contacts.add_contact') }}" class="btn btn-warning btn-sm mt-1">
+          <i class="bi bi-plus-circle me-1"></i>Add Emergency Contact
+        </a>
+        {% endif %}
+      </div>
+      <button class="sos-trigger-btn" onclick="triggerSOS()" id="sosTriggerBtn"
+              {% if not contacts %}disabled title="Add emergency contacts first"{% endif %}>
+        <div class="sos-btn-ring sos-ring-1"></div>
+        <div class="sos-btn-ring sos-ring-2"></div>
+        <div class="sos-btn-ring sos-ring-3"></div>
+        <div class="sos-btn-inner">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <span>SOS</span>
+        </div>
+      </button>
+    </div>
+    {% if not contacts %}
+    <div class="sos-warning-bar">
+      <i class="bi bi-exclamation-circle me-2"></i>
+      Add at least one emergency contact to enable the SOS button
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Stats Row -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="stat-card stat-red">
+        <i class="bi bi-exclamation-circle-fill stat-icon"></i>
+        <div class="stat-val">{{ sos_count }}</div>
+        <div class="stat-label">SOS Alerts</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card stat-blue">
+        <i class="bi bi-person-heart-fill stat-icon"></i>
+        <div class="stat-val">{{ contacts|length }}</div>
+        <div class="stat-label">Contacts</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card stat-purple">
+        <i class="bi bi-file-earmark-text-fill stat-icon"></i>
+        <div class="stat-val">{{ incident_count }}</div>
+        <div class="stat-label">Reports</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card stat-green">
+        <i class="bi bi-shield-check-fill stat-icon"></i>
+        <div class="stat-val">24/7</div>
+        <div class="stat-label">Protection</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="row g-3 mb-4">
+    <div class="col-12">
+      <h5 class="section-label">Quick Actions</h5>
+    </div>
+    <div class="col-6 col-md-3">
+      <a href="tel:112" class="quick-action-card qa-red">
+        <i class="bi bi-telephone-fill"></i>
+        <span>Call 112</span>
+      </a>
+    </div>
+    <div class="col-6 col-md-3">
+      <a href="tel:1091" class="quick-action-card qa-orange">
+        <i class="bi bi-telephone-outbound-fill"></i>
+        <span>Women Helpline</span>
+      </a>
+    </div>
+    <div class="col-6 col-md-3">
+      <a href="{{ url_for('dashboard.nearby_police') }}" class="quick-action-card qa-blue">
+        <i class="bi bi-geo-alt-fill"></i>
+        <span>Nearby Police</span>
+      </a>
+    </div>
+    <div class="col-6 col-md-3">
+      <a href="{{ url_for('incidents.report_incident') }}" class="quick-action-card qa-purple">
+        <i class="bi bi-flag-fill"></i>
+        <span>Report Incident</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <!-- Emergency Contacts -->
+    <div class="col-lg-6">
+      <div class="card-glass h-100">
+        <div class="card-glass-header">
+          <h5><i class="bi bi-person-lines-fill me-2"></i>Emergency Contacts</h5>
+          <a href="{{ url_for('contacts.add_contact') }}" class="btn btn-sm btn-primary-app">
+            <i class="bi bi-plus"></i> Add
+          </a>
+        </div>
+        <div class="card-glass-body">
+          {% if contacts %}
+            {% for c in contacts[:4] %}
+            <div class="contact-row">
+              <div class="contact-avatar-sm">{{ c.name[0].upper() }}</div>
+              <div class="contact-info">
+                <div class="contact-name">{{ c.name }}
+                  {% if c.is_primary %}<span class="badge-primary-tag ms-1">Primary</span>{% endif %}
+                </div>
+                <div class="contact-meta">{{ c.phone }} · {{ c.relationship }}</div>
+              </div>
+              <a href="tel:{{ c.phone }}" class="btn btn-sm btn-call-mini">
+                <i class="bi bi-telephone-fill"></i>
+              </a>
+            </div>
+            {% endfor %}
+            {% if contacts|length > 4 %}
+            <div class="text-center mt-2">
+              <a href="{{ url_for('contacts.list_contacts') }}" class="link-view-all">View all {{ contacts|length }} contacts</a>
+            </div>
+            {% endif %}
+          {% else %}
+          <div class="empty-state-sm">
+            <i class="bi bi-person-plus"></i>
+            <p>No emergency contacts yet</p>
+            <a href="{{ url_for('contacts.add_contact') }}" class="btn btn-sm btn-primary-app">Add Contact</a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent SOS History -->
+    <div class="col-lg-6">
+      <div class="card-glass h-100">
+        <div class="card-glass-header">
+          <h5><i class="bi bi-clock-history me-2"></i>Recent SOS Alerts</h5>
+          <a href="{{ url_for('sos.sos_history') }}" class="link-view-all">View all</a>
+        </div>
+        <div class="card-glass-body">
+          {% if recent_sos %}
+            {% for s in recent_sos %}
+            <div class="sos-row">
+              <div class="sos-status-dot sos-dot-{{ s.status }}"></div>
+              <div class="sos-info">
+                <div class="sos-date">{{ s.triggered_at.strftime('%d %b %Y, %H:%M') }}</div>
+                <div class="sos-meta">{{ s.address or 'Location unavailable' }} · {{ s.contacts_notified }} notified</div>
+              </div>
+              <span class="sos-badge sos-badge-{{ s.status }}">{{ s.status }}</span>
+            </div>
+            {% endfor %}
+          {% else %}
+          <div class="empty-state-sm">
+            <i class="bi bi-shield-check"></i>
+            <p>No SOS alerts yet — stay safe!</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Safety Tips -->
+  <div class="row g-3">
+    <div class="col-12">
+      <h5 class="section-label">Safety Tips</h5>
+    </div>
+    {% for tip in safety_tips %}
+    <div class="col-md-4">
+      <div class="tip-card">
+        <i class="bi bi-{{ tip.icon }} tip-icon"></i>
+        <div>
+          <div class="tip-title">{{ tip.title }}</div>
+          <div class="tip-text">{{ tip.tip }}</div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentSOSId = null;
+
+async function triggerSOS() {
+    const modal = new bootstrap.Modal(document.getElementById('sosModal'));
+    modal.show();
+    document.getElementById('sosStatusText').textContent = 'Fetching your location...';
+
+    let lat = null, lng = null, address = 'Location unavailable';
+
+    try {
+        const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, {timeout: 8000}));
+        lat = pos.coords.latitude;
+        lng = pos.coords.longitude;
+        address = `Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}`;
+        document.getElementById('sosStatusText').textContent = 'Sending alert to your contacts...';
+    } catch(e) {
+        document.getElementById('sosStatusText').textContent = 'Sending alert (location unavailable)...';
+    }
+
+    try {
+        const resp = await fetch('/sos/trigger', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({latitude: lat, longitude: lng, address})
+        });
+        const data = await resp.json();
+        if (data.success) {
+            currentSOSId = data.sos_id;
+            document.getElementById('sosStatusText').textContent = '🚨 SOS Alert Sent!';
+            document.getElementById('sosContactCount').textContent = data.contacts_notified;
+            document.getElementById('sosContactsNotified').classList.remove('d-none');
+        }
+    } catch(e) {
+        document.getElementById('sosStatusText').textContent = 'Error sending SOS. Call 112 directly!';
+    }
+}
+
+async function resolveSOS() {
+    if (currentSOSId) {
+        await fetch(`/sos/resolve/${currentSOSId}`, {method: 'POST'});
+    }
+    bootstrap.Modal.getInstance(document.getElementById('sosModal')).hide();
+    currentSOSId = null;
+    location.reload();
+}
+
+function cancelSOS() {
+    bootstrap.Modal.getInstance(document.getElementById('sosModal')).hide();
+    currentSOSId = null;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Report Incident - SafeHer{% endblock %}
+{% block page_title %}Report Incident{% endblock %}
+{% block content %}
+<div class="page-content">
+  <div class="form-page-wrap">
+    <div class="card-glass p-4">
+      <a href="{{ url_for('incidents.list_incidents') }}" class="back-link-app mb-3 d-inline-block">
+        <i class="bi bi-arrow-left me-1"></i>Back to Reports
+      </a>
+      <h4 class="form-page-title">Report an Incident</h4>
+      <p class="text-muted mb-4">Your report helps keep the community safe and may assist authorities.</p>
+
+      <form method="POST">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-600">Incident Type <span class="text-danger">*</span></label>
+            <select name="incident_type" class="form-select app-input" required>
+              <option value="">-- Select Type --</option>
+              <option>Harassment</option>
+              <option>Stalking</option>
+              <option>Eve-Teasing</option>
+              <option>Assault</option>
+              <option>Robbery</option>
+              <option>Unsafe Area</option>
+              <option>Domestic Violence</option>
+              <option>Cybercrime</option>
+              <option>Suspicious Activity</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-600">Severity</label>
+            <div class="severity-selector">
+              <label class="sev-opt sev-low">
+                <input type="radio" name="severity" value="low"> Low
+              </label>
+              <label class="sev-opt sev-medium">
+                <input type="radio" name="severity" value="medium" checked> Medium
+              </label>
+              <label class="sev-opt sev-high">
+                <input type="radio" name="severity" value="high"> High
+              </label>
+              <label class="sev-opt sev-critical">
+                <input type="radio" name="severity" value="critical"> Critical
+              </label>
+            </div>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-600">Description <span class="text-danger">*</span></label>
+            <textarea name="description" class="form-control app-input" rows="4"
+                      placeholder="Describe what happened in detail..." required></textarea>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-600">Location <span class="text-muted">(optional)</span></label>
+            <div class="location-input-row">
+              <input type="text" name="location_address" id="locationAddr" class="form-control app-input"
+                     placeholder="Enter address or use GPS">
+              <button type="button" class="btn btn-outline-primary" onclick="getLocation()">
+                <i class="bi bi-crosshair me-1"></i>GPS
+              </button>
+            </div>
+            <input type="hidden" name="latitude" id="latInput">
+            <input type="hidden" name="longitude" id="lngInput">
+            <div id="locationStatus" class="text-muted small mt-1"></div>
+          </div>
+          <div class="col-12 d-flex gap-3 mt-2">
+            <button type="submit" class="btn btn-primary-app">
+              <i class="bi bi-flag-fill me-2"></i>Submit Report
+            </button>
+            <a href="{{ url_for('incidents.list_incidents') }}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function getLocation() {
+    const status = document.getElementById('locationStatus');
+    status.textContent = 'Getting location...';
+    navigator.geolocation.getCurrentPosition(pos => {
+        document.getElementById('latInput').value = pos.coords.latitude;
+        document.getElementById('lngInput').value = pos.coords.longitude;
+        document.getElementById('locationAddr').value = `Lat: ${pos.coords.latitude.toFixed(5)}, Lng: ${pos.coords.longitude.toFixed(5)}`;
+        status.innerHTML = '<i class="bi bi-check-circle-fill text-success me-1"></i>Location captured successfully';
+    }, () => { status.innerHTML = '<i class="bi bi-x-circle-fill text-danger me-1"></i>Could not get location'; });
+}
+</script>
+{% endblock %}

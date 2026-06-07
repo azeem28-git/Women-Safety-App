@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin - SafeHer{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body class="admin-body">
+<div class="admin-layout">
+    <!-- Admin Sidebar -->
+    <div class="admin-sidebar">
+        <div class="admin-brand">
+            <i class="bi bi-shield-heart-fill"></i>
+            <div>
+                <div class="brand-title">SafeHer</div>
+                <div class="brand-sub">Admin Panel</div>
+            </div>
+        </div>
+        <nav class="admin-nav">
+            <a href="{{ url_for('admin.dashboard') }}" class="admin-nav-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+                <i class="bi bi-grid-fill"></i> Dashboard
+            </a>
+            <a href="{{ url_for('admin.users') }}" class="admin-nav-link {% if request.endpoint == 'admin.users' %}active{% endif %}">
+                <i class="bi bi-people-fill"></i> Users
+            </a>
+            <a href="{{ url_for('admin.incidents') }}" class="admin-nav-link {% if request.endpoint == 'admin.incidents' %}active{% endif %}">
+                <i class="bi bi-file-earmark-text-fill"></i> Incidents
+            </a>
+            <a href="{{ url_for('admin.sos_history') }}" class="admin-nav-link {% if request.endpoint == 'admin.sos_history' %}active{% endif %}">
+                <i class="bi bi-clock-history"></i> SOS History
+            </a>
+        </nav>
+        <div class="admin-sidebar-footer">
+            <div class="admin-user">
+                <i class="bi bi-person-circle me-2"></i>
+                {{ session.get('admin_name', 'Admin') }}
+            </div>
+            <a href="{{ url_for('admin.logout') }}" class="admin-logout">
+                <i class="bi bi-box-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Admin Main -->
+    <div class="admin-main">
+        <div class="admin-topbar">
+            <h5 class="admin-page-title">{% block page_title %}Dashboard{% endblock %}</h5>
+            <div class="admin-topbar-right">
+                <a href="{{ url_for('index') }}" class="btn btn-sm btn-outline-secondary" target="_blank">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>View App
+                </a>
+            </div>
+        </div>
+
+        <div class="admin-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}{% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show">
+                {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}{% endif %}{% endwith %}
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

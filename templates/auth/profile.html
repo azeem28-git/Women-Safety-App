@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}My Profile - SafeHer{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+{% block content %}
+<div class="page-content">
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <div class="card-glass text-center p-4">
+        <div class="profile-avatar-lg">{{ current_user.full_name[0].upper() }}</div>
+        <h4 class="mt-3 mb-1 fw-700">{{ current_user.full_name }}</h4>
+        <p class="text-muted mb-2">{{ current_user.email }}</p>
+        <span class="badge bg-success px-3 py-2">
+          <i class="bi bi-shield-check me-1"></i>Active Account
+        </span>
+        <hr>
+        <div class="profile-meta">
+          <div class="meta-item"><i class="bi bi-phone"></i> {{ current_user.phone }}</div>
+          {% if current_user.address %}
+          <div class="meta-item"><i class="bi bi-house"></i> {{ current_user.address }}</div>
+          {% endif %}
+          <div class="meta-item"><i class="bi bi-calendar"></i> Joined {{ current_user.created_at.strftime('%b %Y') }}</div>
+          {% if current_user.last_login %}
+          <div class="meta-item"><i class="bi bi-clock"></i> Last login {{ current_user.last_login.strftime('%d %b %Y, %H:%M') }}</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-8">
+      <div class="card-glass p-4 mb-4">
+        <h5 class="section-card-title"><i class="bi bi-pencil-fill me-2"></i>Update Profile</h5>
+        <form method="POST" action="{{ url_for('auth.profile') }}">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-600">Full Name</label>
+              <input type="text" name="full_name" class="form-control app-input" value="{{ current_user.full_name }}" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600">Phone Number</label>
+              <input type="tel" name="phone" class="form-control app-input" value="{{ current_user.phone }}" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-600">Address</label>
+              <input type="text" name="address" class="form-control app-input" value="{{ current_user.address or '' }}">
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary-app">
+                <i class="bi bi-save me-2"></i>Save Changes
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="card-glass p-4">
+        <h5 class="section-card-title"><i class="bi bi-lock-fill me-2"></i>Change Password</h5>
+        <form method="POST" action="{{ url_for('auth.profile') }}">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label fw-600">Current Password</label>
+              <input type="password" name="current_password" class="form-control app-input" placeholder="Enter current password">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600">New Password</label>
+              <input type="password" name="new_password" class="form-control app-input" placeholder="Min 8 characters">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600">Confirm New Password</label>
+              <input type="password" name="confirm_password" class="form-control app-input" placeholder="Repeat new password">
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-outline-danger">
+                <i class="bi bi-key me-2"></i>Update Password
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

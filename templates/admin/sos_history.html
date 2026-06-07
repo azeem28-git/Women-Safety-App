@@ -1,0 +1,51 @@
+{% extends "admin/base.html" %}
+{% block title %}SOS History - Admin SafeHer{% endblock %}
+{% block page_title %}SOS Alert History{% endblock %}
+{% block content %}
+<div class="admin-card">
+  <div class="admin-card-header">
+    <h6><i class="bi bi-clock-history me-2"></i>All SOS Alerts ({{ history.total }})</h6>
+  </div>
+  <div class="admin-card-body p-0">
+    <div class="table-responsive">
+      <table class="table admin-table mb-0">
+        <thead>
+          <tr><th>#</th><th>User</th><th>Triggered At</th><th>Location</th><th>Contacts Notified</th><th>Status</th><th>Resolved At</th></tr>
+        </thead>
+        <tbody>
+        {% for s in history.items %}
+        <tr>
+          <td class="text-muted">#{{ s.id }}</td>
+          <td class="fw-600">{{ s.user.full_name }}<br><small class="text-muted">{{ s.user.phone }}</small></td>
+          <td>{{ s.triggered_at.strftime('%d %b %Y') }}<br><small class="text-muted">{{ s.triggered_at.strftime('%H:%M:%S') }}</small></td>
+          <td>
+            {% if s.latitude and s.longitude %}
+            <a href="https://www.google.com/maps?q={{ s.latitude }},{{ s.longitude }}" target="_blank" class="admin-map-link">
+              <i class="bi bi-geo-alt me-1"></i>{{ s.address or 'View Map' }}
+            </a>
+            {% else %}<span class="text-muted">Unavailable</span>{% endif %}
+          </td>
+          <td><span class="badge bg-primary">{{ s.contacts_notified }}</span></td>
+          <td><span class="status-badge status-{{ s.status }}"><span class="status-dot"></span>{{ s.status|title }}</span></td>
+          <td class="text-muted small">{{ s.resolved_at.strftime('%d %b %Y %H:%M') if s.resolved_at else '—' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-center text-muted py-4">No SOS alerts recorded.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% if history.pages > 1 %}
+  <div class="admin-card-footer">
+    <nav><ul class="pagination pagination-sm mb-0">
+      {% if history.has_prev %}<li class="page-item"><a class="page-link" href="?page={{ history.prev_num }}">Previous</a></li>{% endif %}
+      {% for p in history.iter_pages() %}{% if p %}
+      <li class="page-item {% if p == history.page %}active{% endif %}"><a class="page-link" href="?page={{ p }}">{{ p }}</a></li>
+      {% endif %}{% endfor %}
+      {% if history.has_next %}<li class="page-item"><a class="page-link" href="?page={{ history.next_num }}">Next</a></li>{% endif %}
+    </ul></nav>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

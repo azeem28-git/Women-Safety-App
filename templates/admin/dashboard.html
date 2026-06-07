@@ -1,0 +1,131 @@
+{% extends "admin/base.html" %}
+{% block title %}Admin Dashboard - SafeHer{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
+{% block content %}
+
+<!-- Stats -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-xl-3">
+    <div class="admin-stat-card asc-blue">
+      <div class="asc-icon"><i class="bi bi-people-fill"></i></div>
+      <div class="asc-val">{{ total_users }}</div>
+      <div class="asc-label">Total Users</div>
+      <div class="asc-sub">{{ active_users }} active</div>
+    </div>
+  </div>
+  <div class="col-6 col-xl-3">
+    <div class="admin-stat-card asc-red">
+      <div class="asc-icon"><i class="bi bi-exclamation-circle-fill"></i></div>
+      <div class="asc-val">{{ total_sos }}</div>
+      <div class="asc-label">SOS Alerts</div>
+      <div class="asc-sub">All time</div>
+    </div>
+  </div>
+  <div class="col-6 col-xl-3">
+    <div class="admin-stat-card asc-orange">
+      <div class="asc-icon"><i class="bi bi-file-earmark-text-fill"></i></div>
+      <div class="asc-val">{{ total_incidents }}</div>
+      <div class="asc-label">Incidents</div>
+      <div class="asc-sub">{{ pending_incidents }} pending</div>
+    </div>
+  </div>
+  <div class="col-6 col-xl-3">
+    <div class="admin-stat-card asc-green">
+      <div class="asc-icon"><i class="bi bi-shield-check-fill"></i></div>
+      <div class="asc-val">{{ total_users - (total_users - active_users) }}</div>
+      <div class="asc-label">Active Users</div>
+      <div class="asc-sub">Currently enabled</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Recent SOS -->
+  <div class="col-lg-6">
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <h6><i class="bi bi-exclamation-circle-fill text-danger me-2"></i>Recent SOS Alerts</h6>
+        <a href="{{ url_for('admin.sos_history') }}" class="admin-link-all">View All</a>
+      </div>
+      <div class="admin-card-body p-0">
+        {% if recent_sos %}
+        <table class="table admin-table mb-0">
+          <thead><tr><th>User</th><th>Time</th><th>Contacts</th><th>Status</th></tr></thead>
+          <tbody>
+          {% for s in recent_sos %}
+          <tr>
+            <td>{{ s.user.full_name }}</td>
+            <td class="text-muted small">{{ s.triggered_at.strftime('%d %b, %H:%M') }}</td>
+            <td>{{ s.contacts_notified }}</td>
+            <td><span class="status-badge status-{{ s.status }}"><span class="status-dot"></span>{{ s.status|title }}</span></td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% else %}<div class="p-3 text-muted">No SOS alerts yet.</div>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Incidents -->
+  <div class="col-lg-6">
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <h6><i class="bi bi-file-earmark-text-fill text-warning me-2"></i>Recent Incidents</h6>
+        <a href="{{ url_for('admin.incidents') }}" class="admin-link-all">View All</a>
+      </div>
+      <div class="admin-card-body p-0">
+        {% if recent_incidents %}
+        <table class="table admin-table mb-0">
+          <thead><tr><th>Type</th><th>User</th><th>Severity</th><th>Status</th></tr></thead>
+          <tbody>
+          {% for r in recent_incidents %}
+          <tr>
+            <td class="fw-600">{{ r.incident_type }}</td>
+            <td class="text-muted small">{{ r.user.full_name }}</td>
+            <td><span class="severity-badge severity-{{ r.severity }}">{{ r.severity|title }}</span></td>
+            <td><span class="status-badge status-{{ r.status }}"><span class="status-dot"></span>{{ r.status|title }}</span></td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% else %}<div class="p-3 text-muted">No incidents reported yet.</div>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Users -->
+  <div class="col-12">
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <h6><i class="bi bi-person-plus-fill text-primary me-2"></i>Newly Registered Users</h6>
+        <a href="{{ url_for('admin.users') }}" class="admin-link-all">View All</a>
+      </div>
+      <div class="admin-card-body p-0">
+        {% if recent_users %}
+        <table class="table admin-table mb-0">
+          <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th>Status</th></tr></thead>
+          <tbody>
+          {% for u in recent_users %}
+          <tr>
+            <td class="fw-600">{{ u.full_name }}</td>
+            <td>{{ u.email }}</td>
+            <td>{{ u.phone }}</td>
+            <td class="text-muted small">{{ u.created_at.strftime('%d %b %Y') }}</td>
+            <td>
+              {% if u.is_active %}
+              <span class="badge bg-success">Active</span>
+              {% else %}
+              <span class="badge bg-secondary">Inactive</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% else %}<div class="p-3 text-muted">No users registered yet.</div>{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

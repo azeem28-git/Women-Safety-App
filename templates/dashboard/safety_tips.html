@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Safety Tips - SafeHer{% endblock %}
+{% block page_title %}Safety Tips{% endblock %}
+{% block content %}
+<div class="page-content">
+  <div class="tips-hero mb-4">
+    <h2><i class="bi bi-lightbulb-fill me-2 text-warning"></i>Women Safety Guidelines</h2>
+    <p class="text-muted">Essential tips to keep you safe every day</p>
+  </div>
+  <div class="row g-4">
+    {% for tip_group in tips %}
+    <div class="col-lg-6">
+      <div class="card-glass p-0 overflow-hidden h-100">
+        <div class="tip-group-header bg-{{ tip_group.color }} bg-opacity-10">
+          <i class="bi bi-{{ tip_group.icon }} text-{{ tip_group.color }} me-2 fs-4"></i>
+          <h5 class="mb-0 fw-700 text-{{ tip_group.color }}">{{ tip_group.category }}</h5>
+        </div>
+        <ul class="tip-list">
+          {% for item in tip_group['items'] %}
+          <li class="tip-list-item">
+            <i class="bi bi-check-circle-fill text-{{ tip_group.color }} me-2"></i>
+            {{ item }}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="emergency-numbers-card mt-4">
+    <h5><i class="bi bi-telephone-fill me-2"></i>Emergency Helpline Numbers (India)</h5>
+    <div class="row g-3 mt-2">
+      <div class="col-6 col-md-3">
+        <a href="tel:112" class="helpline-card">
+          <div class="helpline-num">112</div>
+          <div class="helpline-label">Emergency</div>
+        </a>
+      </div>
+      <div class="col-6 col-md-3">
+        <a href="tel:1091" class="helpline-card">
+          <div class="helpline-num">1091</div>
+          <div class="helpline-label">Women Helpline</div>
+        </a>
+      </div>
+      <div class="col-6 col-md-3">
+        <a href="tel:100" class="helpline-card">
+          <div class="helpline-num">100</div>
+          <div class="helpline-label">Police</div>
+        </a>
+      </div>
+      <div class="col-6 col-md-3">
+        <a href="tel:108" class="helpline-card">
+          <div class="helpline-num">108</div>
+          <div class="helpline-label">Ambulance</div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

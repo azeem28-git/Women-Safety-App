@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Incident #{{ incident.id }} - SafeHer{% endblock %}
+{% block page_title %}Incident Detail{% endblock %}
+{% block content %}
+<div class="page-content">
+  <div class="form-page-wrap">
+    <a href="{{ url_for('incidents.list_incidents') }}" class="back-link-app mb-3 d-inline-block">
+      <i class="bi bi-arrow-left me-1"></i>Back to Reports
+    </a>
+    <div class="card-glass p-4">
+      <div class="incident-detail-header">
+        <div>
+          <h4>Incident #{{ incident.id }}</h4>
+          <div class="d-flex gap-2 mt-1">
+            <span class="severity-badge severity-{{ incident.severity }}">{{ incident.severity|title }}</span>
+            <span class="status-badge status-{{ incident.status }}">
+              <span class="status-dot"></span>{{ incident.status|title }}
+            </span>
+          </div>
+        </div>
+        <div class="text-muted text-end small">
+          Reported on<br>{{ incident.reported_at.strftime('%d %b %Y at %H:%M') }}
+        </div>
+      </div>
+      <hr>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="detail-field">
+            <div class="detail-label">Incident Type</div>
+            <div class="detail-value">{{ incident.incident_type }}</div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="detail-field">
+            <div class="detail-label">Location</div>
+            <div class="detail-value">
+              {% if incident.location_address %}{{ incident.location_address }}
+              {% else %}<span class="text-muted">Not provided</span>{% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="detail-field">
+            <div class="detail-label">Description</div>
+            <div class="detail-value">{{ incident.description }}</div>
+          </div>
+        </div>
+        {% if incident.admin_notes %}
+        <div class="col-12">
+          <div class="detail-field admin-notes-field">
+            <div class="detail-label"><i class="bi bi-shield-fill me-1"></i>Admin Notes</div>
+            <div class="detail-value">{{ incident.admin_notes }}</div>
+          </div>
+        </div>
+        {% endif %}
+        {% if incident.latitude and incident.longitude %}
+        <div class="col-12">
+          <a href="https://www.google.com/maps?q={{ incident.latitude }},{{ incident.longitude }}"
+             target="_blank" class="btn btn-outline-primary">
+            <i class="bi bi-map me-2"></i>View Location on Map
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} Contact - SafeHer{% endblock %}
+{% block page_title %}{{ action }} Emergency Contact{% endblock %}
+{% block content %}
+<div class="page-content">
+  <div class="form-page-wrap">
+    <div class="card-glass p-4">
+      <div class="mb-4">
+        <a href="{{ url_for('contacts.list_contacts') }}" class="back-link-app">
+          <i class="bi bi-arrow-left me-1"></i>Back to Contacts
+        </a>
+        <h4 class="form-page-title mt-2">{{ action }} Emergency Contact</h4>
+        <p class="text-muted">This person will be alerted when you trigger an SOS.</p>
+      </div>
+      <form method="POST">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-600">Full Name <span class="text-danger">*</span></label>
+            <input type="text" name="name" class="form-control app-input"
+                   value="{{ contact.name if contact else '' }}" placeholder="Jane Doe" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-600">Phone Number <span class="text-danger">*</span></label>
+            <input type="tel" name="phone" class="form-control app-input"
+                   value="{{ contact.phone if contact else '' }}" placeholder="+91 98765 43210" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-600">Relationship <span class="text-danger">*</span></label>
+            <select name="relationship" class="form-select app-input" required>
+              <option value="">-- Select --</option>
+              {% set rels = ['Mother','Father','Sister','Brother','Husband','Friend','Colleague','Neighbor','Aunt','Uncle','Other'] %}
+              {% for r in rels %}
+              <option value="{{ r }}" {% if contact and contact.relationship == r %}selected{% endif %}>{{ r }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-600">Email <span class="text-muted">(optional)</span></label>
+            <input type="email" name="email" class="form-control app-input"
+                   value="{{ contact.email if contact else '' }}" placeholder="contact@email.com">
+          </div>
+          <div class="col-12">
+            <div class="form-check-card {% if contact and contact.is_primary %}checked{% endif %}" id="primaryCard" onclick="togglePrimary()">
+              <div>
+                <div class="fw-600">Set as Primary Contact</div>
+                <div class="text-muted small">Primary contact appears first in your SOS list</div>
+              </div>
+              <input type="checkbox" name="is_primary" id="isPrimary" class="form-check-input"
+                     {% if contact and contact.is_primary %}checked{% endif %} style="width:20px;height:20px;">
+            </div>
+          </div>
+          <div class="col-12 d-flex gap-3 mt-2">
+            <button type="submit" class="btn btn-primary-app">
+              <i class="bi bi-save me-2"></i>{{ action }} Contact
+            </button>
+            <a href="{{ url_for('contacts.list_contacts') }}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function togglePrimary() {
+    const cb = document.getElementById('isPrimary');
+    const card = document.getElementById('primaryCard');
+    cb.checked = !cb.checked;
+    card.classList.toggle('checked', cb.checked);
+}
+</script>
+{% endblock %}

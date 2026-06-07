@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - SafeHer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+</head>
+<body class="auth-page">
+<div class="auth-container">
+    <div class="auth-left">
+        <div class="auth-left-content">
+            <div class="auth-brand">
+                <i class="bi bi-shield-heart-fill"></i>
+                SafeHer
+            </div>
+            <h2 class="auth-tagline">Your Safety,<br>Always First.</h2>
+            <p class="auth-sub">Every tap could save your life. We're here when it matters most.</p>
+            <div class="auth-features">
+                <div class="af"><i class="bi bi-check-circle-fill"></i> One-tap SOS alert</div>
+                <div class="af"><i class="bi bi-check-circle-fill"></i> Live location sharing</div>
+                <div class="af"><i class="bi bi-check-circle-fill"></i> Emergency contacts</div>
+                <div class="af"><i class="bi bi-check-circle-fill"></i> Incident reporting</div>
+            </div>
+        </div>
+        <div class="auth-left-decoration">
+            <div class="deco-circle c1"></div>
+            <div class="deco-circle c2"></div>
+            <div class="deco-circle c3"></div>
+        </div>
+    </div>
+
+    <div class="auth-right">
+        <div class="auth-form-wrap">
+            <a href="{{ url_for('index') }}" class="back-link">
+                <i class="bi bi-arrow-left"></i> Back to home
+            </a>
+            <h2 class="form-title">Welcome back</h2>
+            <p class="form-sub">Sign in to your SafeHer account</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}{% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show">
+                {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}{% endif %}{% endwith %}
+
+            <form method="POST" action="{{ url_for('auth.login') }}">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <div class="input-icon-wrap">
+                        <i class="bi bi-envelope-fill input-icon"></i>
+                        <input type="email" name="email" class="form-control auth-input" placeholder="you@example.com" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <div class="input-icon-wrap">
+                        <i class="bi bi-lock-fill input-icon"></i>
+                        <input type="password" name="password" id="passwordInput" class="form-control auth-input" placeholder="••••••••" required>
+                        <button type="button" class="toggle-pw" onclick="togglePW()">
+                            <i class="bi bi-eye-fill" id="pwIcon"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-check-row">
+                    <label class="custom-check">
+                        <input type="checkbox" name="remember">
+                        <span class="checkmark"></span>
+                        Remember me
+                    </label>
+                </div>
+                <button type="submit" class="btn-auth-submit">
+                    <i class="bi bi-shield-check me-2"></i>Sign In Securely
+                </button>
+            </form>
+
+            <p class="auth-switch">Don't have an account? <a href="{{ url_for('auth.register') }}">Create one free</a></p>
+
+            <div class="admin-link-wrap">
+                <a href="{{ url_for('admin.login') }}" class="admin-link">
+                    <i class="bi bi-shield-lock me-1"></i>Admin Portal
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function togglePW() {
+    const inp = document.getElementById('passwordInput');
+    const icon = document.getElementById('pwIcon');
+    if (inp.type === 'password') {
+        inp.type = 'text';
+        icon.className = 'bi bi-eye-slash-fill';
+    } else {
+        inp.type = 'password';
+        icon.className = 'bi bi-eye-fill';
+    }
+}
+</script>
+</body>
+</html>

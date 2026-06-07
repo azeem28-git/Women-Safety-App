@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}SOS History - SafeHer{% endblock %}
+{% block page_title %}SOS History{% endblock %}
+{% block content %}
+<div class="page-content">
+  <div class="page-header-row">
+    <div>
+      <h4 class="page-h">SOS Alert History</h4>
+      <p class="text-muted">{{ history|length }} alert{% if history|length != 1 %}s{% endif %} recorded</p>
+    </div>
+    <button class="btn btn-danger btn-lg" onclick="triggerSOS()" id="sosTriggerBtn">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>Trigger SOS
+    </button>
+  </div>
+
+  {% if history %}
+  <div class="card-glass">
+    <div class="table-responsive">
+      <table class="table app-table mb-0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Date & Time</th>
+            <th>Location</th>
+            <th>Contacts Notified</th>
+            <th>Status</th>
+            <th>Resolved At</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in history %}
+          <tr>
+            <td class="fw-600">#{{ s.id }}</td>
+            <td>{{ s.triggered_at.strftime('%d %b %Y') }}<br>
+                <small class="text-muted">{{ s.triggered_at.strftime('%H:%M:%S') }}</small></td>
+            <td>
+              {% if s.latitude and s.longitude %}
+              <a href="https://www.google.com/maps?q={{ s.latitude }},{{ s.longitude }}" target="_blank" class="location-link">
+                <i class="bi bi-geo-alt me-1"></i>{{ s.address or 'View on map' }}
+              </a>
+              {% else %}
+              <span class="text-muted">Not available</span>
+              {% endif %}
+            </td>
+            <td><span class="badge bg-primary">{{ s.contacts_notified }} contact{% if s.contacts_notified != 1 %}s{% endif %}</span></td>
+            <td>
+              <span class="status-badge status-{{ s.status }}">
+                <span class="status-dot"></span>{{ s.status|title }}
+              </span>
+            </td>
+            <td>
+              {% if s.resolved_at %}
+              {{ s.resolved_at.strftime('%d %b %Y %H:%M') }}
+              {% else %}
+              <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="empty-state-full">
+    <div class="empty-icon text-success"><i class="bi bi-shield-check"></i></div>
+    <h4>No SOS Alerts</h4>
+    <p>You haven't triggered any SOS alerts. Stay safe!</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+let currentSOSId = null;
+async function triggerSOS() {
+    const modal = new bootstrap.Modal(document.getElementById('sosModal'));
+    modal.show();
+    document.getElementById('sosStatusText').textContent = 'Fetching your location...';
+    let lat = null, lng = null, address = 'Location unavailable';
+    try {
+        const pos = await new Promise((res,rej) => navigator.geolocation.getCurrentPosition(res,rej,{timeout:8000}));
+        lat = pos.coords.latitude; lng = pos.coords.longitude;
+        address = `Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}`;
+    } catch(e) {}
+    try {
+        const resp = await fetch('/sos/trigger', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({latitude:lat,longitude:lng,address})});
+        const data = await resp.json();
+        if (data.success) {
+            currentSOSId = data.sos_id;
+            document.getElementById('sosStatusText').textContent = '🚨 SOS Alert Sent!';
+            document.getElementById('sosContactCount').textContent = data.contacts_notified;
+            document.getElementById('sosContactsNotified').classList.remove('d-none');
+        }
+    } catch(e) { document.getElementById('sosStatusText').textContent = 'Error sending SOS!'; }
+}
+async function resolveSOS() {
+    if (currentSOSId) await fetch(`/sos/resolve/${currentSOSId}`, {method:'POST'});
+    bootstrap.Modal.getInstance(document.getElementById('sosModal')).hide();
+    location.reload();
+}
+function cancelSOS() { bootstrap.Modal.getInstance(document.getElementById('sosModal')).hide(); }
+</script>
+{% endblock %}
