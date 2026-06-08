@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from datetime import datetime
 from models import db, User, EmergencyContact, SOSHistory, IncidentReport, Admin
@@ -58,6 +58,10 @@ def create_app(config_name=None):
     @app.errorhandler(500)
     def server_error(e):
         return render_template('errors/500.html'), 500
+
+    @app.route('/service-worker.js')
+    def service_worker():
+        return send_from_directory(app.static_folder, 'service-worker.js')
 
     with app.app_context():
         # Optionally skip DB creation (useful when remote DB is unreachable).
