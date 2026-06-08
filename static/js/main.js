@@ -117,9 +117,33 @@ async function shareLocation() {
     }
 }
 
+// Landing page mobile nav toggle
+function initLandingNavToggle() {
+    const landingNav = document.querySelector('.landing-nav');
+    const toggleButton = document.getElementById('landingNavToggle');
+    const navLinks = document.querySelectorAll('.landing-nav .nav-links a');
+
+    if (!landingNav || !toggleButton) return;
+
+    toggleButton.addEventListener('click', () => {
+        landingNav.classList.toggle('open');
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!landingNav.classList.contains('open')) return;
+        if (landingNav.contains(event.target)) return;
+        landingNav.classList.remove('open');
+    });
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => landingNav.classList.remove('open'));
+    });
+}
+
 // Register service worker for PWA support
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
+        initLandingNavToggle();
         navigator.serviceWorker.register('/service-worker.js')
             .then(reg => {
                 console.log('Service worker registered:', reg.scope);
@@ -128,4 +152,6 @@ if ('serviceWorker' in navigator) {
                 console.warn('Service worker registration failed:', err);
             });
     });
+} else {
+    window.addEventListener('load', initLandingNavToggle);
 }
